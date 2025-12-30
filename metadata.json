@@ -1,0 +1,5 @@
+{
+  "name": "AceMock - AI 模拟考试平台",
+  "description": "基于 Gemini AI 的智能模拟考试平台，支持上传文档（PDF、Word、Excel）自动生成个性化试卷、抽认卡和测验。",
+  "requestFramePermissions": []
+}
