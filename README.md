@@ -85,4 +85,31 @@ python -m http.server 8000
 
 ---
 
-*Made with ❤️ and Gemini AI.*
+应用部分截图：
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/48be0b89-dc6d-4038-9efc-be43823bed31" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/8c031dff-6bef-4a98-b5f4-01993752aee9" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/31558696-afc4-48ef-996f-80ba1237bf1c" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/4856248d-f1c7-41e0-bc7e-61eaf13b5ca5" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/d2037f8d-bb35-44d3-a1af-174917d584bc" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/d0744ee4-4011-450e-9cc4-69df155f1233" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/337beebb-44ba-4baf-955b-3c1feac889a7" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/66f81b67-1fda-4ff1-a003-d13519078f7c" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/74290bf0-1dfe-4f1a-81fe-168d55288d05" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/6b34195d-ba88-417a-8d0a-0f02db950d58" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/45a7708e-a326-4f85-96e3-e3bb279a888b" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/760ba815-104e-4ab4-a78c-628a3634fcf1" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/855f8f59-627f-4db2-9ce3-1d9f91449191" />
+
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/3655c75d-9d70-4f28-9c2d-f1c581cbf902" />
