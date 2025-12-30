@@ -6,8 +6,6 @@ const STORAGE_PREFIX = 'aceMock_key_';
 export type SearchProvider = 'baidu_search1' | 'google_serper' | 'tavily';
 export type ShardingMode = 'SERIAL' | 'PARALLEL';
 
-const DEFAULT_TAVILY_KEY = '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';
-
 // Helper to get key
 export const getSearchKey = (provider: SearchProvider): string => {
     return localStorage.getItem(`${STORAGE_PREFIX}${provider}`) || '';
@@ -150,7 +148,11 @@ export const searchGoogleSerper = async (query: string): Promise<SearchResult[]>
  * Searches using Tavily API
  */
 export const searchTavily = async (query: string): Promise<SearchResult[]> => {
-    const apiKey = getSearchKey('tavily') || DEFAULT_TAVILY_KEY;
+    const apiKey = getSearchKey('tavily');
+    if (!apiKey) {
+        console.warn("Tavily API Key not configured");
+        return [];
+    }
     
     try {
         const response = await fetch('https://api.tavily.com/search', {
@@ -193,7 +195,7 @@ export const searchTavily = async (query: string): Promise<SearchResult[]> => {
  * Tests connection to a specific provider
  */
 export const testSearchConnection = async (provider: SearchProvider, testKey?: string): Promise<boolean> => {
-    const keyToUse = testKey || getSearchKey(provider) || (provider === 'tavily' ? DEFAULT_TAVILY_KEY : '');
+    const keyToUse = testKey || getSearchKey(provider);
     if (!keyToUse) return false;
 
     try {
