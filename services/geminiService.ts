@@ -519,28 +519,43 @@ export const recommendQuestionTypes = async (materials: Material[]): Promise<Que
     }));
 
     const prompt = `
-        分析附件文档，根据以下【三层判断策略】推荐最适合的考试题型：
-        
-        第一层：【原文精确匹配】(最高优先级)
-        - 若文档中显式出现了“名词解释”、“术语定义”，必须勾选 NOUN_EXPLANATION。
-        - 若显式出现“判断题”、“对错题”，必须勾选 TRUE_FALSE。
-        - 若显式出现“填空题”，必须勾选 FILL_IN_BLANK。
-        - 若显式出现“连线题”，必须勾选 MATCHING。
-        - 若显式出现“排序题”，必须勾选 ORDERING。
-        - 若显式出现“鉴析题”、“案例分析”，必须勾选 ANALYSIS。
+        你是一名严谨的**试卷结构分析师**。你的任务是分析上传的文档，并精确返回文档中**已包含**的试题类型。
 
-        第二层：【近义词逻辑映射】
-        - “简述题”、“简答题”、“问答题”、“描述题” -> 统一映射为 SHORT_ANSWER。
-        - “论述题”、“分析题” -> 若偏向理论则映射为 SHORT_ANSWER，偏向实例则映射为 ANALYSIS。
-        - “选择题” (带有 A/B/C/D 选项) -> SINGLE_CHOICE 或 MULTI_CHOICE。
+        请严格执行以下 **三重判断策略**，按顺序执行，一旦匹配成功即停止后续推理：
 
-        第三层：【AI 深度推理适配】
-        - 若文档主要是零散的知识点、事实、日期 -> 建议单选 (SINGLE_CHOICE) 和填空 (FILL_IN_BLANK)。
-        - 若文档包含大量复杂概念定义 -> 建议名词解释 (NOUN_EXPLANATION)。
+        **策略一：显性标题关键字匹配 (最高优先级)**
+        扫描文档，寻找是否存在明确的“题型标题”或“习题板块”。
+        检测规则：
+        - 出现 “单选”、“单项选择” -> 返回 SINGLE_CHOICE
+        - 出现 “多选”、“多项选择” -> 返回 MULTI_CHOICE
+        - 出现 “选择题” (未指明单多选) -> 返回 SINGLE_CHOICE
+        - 出现 “填空” -> 返回 FILL_IN_BLANK
+        - 出现 “判断”、“是非” -> 返回 TRUE_FALSE
+        - 出现 “连线”、“配对” -> 返回 MATCHING
+        - 出现 “排序” -> 返回 ORDERING
+        - 出现 “简答”、“简述”、“问答” -> 返回 SHORT_ANSWER
+        - 出现 “名词解释”、“术语” -> 返回 NOUN_EXPLANATION
+        - 出现 “鉴析”、“分析”、“案例” -> 返回 ANALYSIS
+        - 出现 “抽认卡” -> 返回 FLASHCARD
+
+        **重要原则：** 
+        1. 只要发现了上述显性标题（例如文档中有“一、名词解释”和“【简述题】”），请**只返回**识别到的题型列表（如 ["NOUN_EXPLANATION", "SHORT_ANSWER"]）。
+        2. **绝对禁止**添加文档中没有标题对应但你觉得可以生成的题型。例如：文档只有简答题，不要因为里面有文字就推荐选择题。
+
+        **策略二：隐性题型结构分析 (中优先级)**
+        (仅当策略一未检测到任何标题时执行)
+        分析文本格式特征：
+        - 发现 "A." "B." "C." "D." 列表 -> 判定为 SINGLE_CHOICE
+        - 发现 "(__)" 或 "______" -> 判定为 FILL_IN_BLANK
+        - 发现 "√" "×" 或 "( )" 后跟判断内容 -> 判定为 TRUE_FALSE
         
-        输出要求：
-        - 请返回一个 JSON 数组，包含所有识别到的题型枚举值。
-        - 示例: ["SHORT_ANSWER", "NOUN_EXPLANATION", "SINGLE_CHOICE"]
+        **策略三：纯内容生成推荐 (最低优先级)**
+        (仅当策略一和二都未命中，即文档看似纯教材/文章时执行)
+        - 基于内容知识点，推荐适合生成的题型（如选择、判断、填空、名词解释）。
+
+        **输出要求：**
+        - 请返回一个 JSON 数组，包含推荐的题型枚举值。
+        - 示例: ["SINGLE_CHOICE", "TRUE_FALSE", "SHORT_ANSWER"]
     `;
 
     try {
@@ -549,12 +564,17 @@ export const recommendQuestionTypes = async (materials: Material[]): Promise<Que
             contents: { parts: [...parts, { text: prompt }] },
             config: { 
                 responseMimeType: "application/json",
-                temperature: 0.1,
+                temperature: 0.0,
                 thinkingConfig: { thinkingBudget: 0 }
             }
         });
         const text = response.text || "[]";
-        return JSON.parse(text) as QuestionType[];
+        // Clean potential markdown blocks
+        const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        // Look for [ ... ] pattern just in case there is extra text
+        const match = cleaned.match(/\[.*\]/s);
+        const jsonStr = match ? match[0] : "[]";
+        return JSON.parse(jsonStr) as QuestionType[];
     } catch (e) {
         console.error("Smart Analysis Error:", e);
         return [QuestionType.SINGLE_CHOICE, QuestionType.TRUE_FALSE, QuestionType.SHORT_ANSWER];
